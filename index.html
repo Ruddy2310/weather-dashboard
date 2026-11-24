@@ -31,7 +31,7 @@ button{font:inherit;border:0;background:var(--acc);color:#fff;padding:12px 20px;
 <p class="note">Built by Rudra Soni · HTML, CSS, JavaScript</p>
 </main>
 <script>
-// Demo data (used when no API key is set).
+// Demo data (used here because hosted pages can't call external APIs).
 var D={rajkot:[33,"clear sky","☀️",28,12],mumbai:[30,"haze","🌫️",74,15],delhi:[27,"few clouds","⛅",45,9],london:[9,"light rain","🌧️",83,20],"new york":[6,"overcast clouds","☁️",60,18],tokyo:[14,"clear sky","☀️",52,11],dubai:[34,"clear sky","☀️",40,16]};
 var KEY="";try{KEY=localStorage.getItem("owm")||""}catch(e){}
 var out=document.getElementById("out"),note=document.getElementById("note"),q=document.getElementById("q");
@@ -41,9 +41,9 @@ async function go(city){
   city=city.trim();if(!city)return;note.textContent="";note.className="note";
   if(KEY){try{var r=await fetch("https://api.openweathermap.org/data/2.5/weather?q="+encodeURIComponent(city)+"&units=metric&appid="+KEY);var j=await r.json();
     if(j.cod==200){show(j.name,j.main.temp,j.weather[0].description,icon(j.weather[0].id),j.main.humidity,Math.round(j.wind.speed*3.6));note.textContent="Live data from OpenWeatherMap.";return}
-    note.textContent=j.message||"City not found.";note.className="note err";return}catch(e){note.textContent="Live API failed, showing demo data."}}
+    note.textContent=j.message||"City not found.";note.className="note err";return}catch(e){note.textContent="Live API blocked here, showing demo data."}}
   var d=D[city.toLowerCase()];
-  if(d){show(city[0].toUpperCase()+city.slice(1),d[0],d[1],d[2],d[3],d[4]);if(!note.textContent)note.textContent="Demo data. Add your OpenWeatherMap key to go live."}
+  if(d){show(city[0].toUpperCase()+city.slice(1),d[0],d[1],d[2],d[3],d[4]);if(!note.textContent)note.textContent="Demo data. Add your OpenWeatherMap key in the code to go live."}
   else{out.innerHTML='<div class="ic">🔎</div><p class="c">City not found. Try Rajkot, Mumbai, Delhi, London, Tokyo…</p>'}
 }
 document.getElementById("f").onsubmit=function(e){e.preventDefault();go(q.value)};
