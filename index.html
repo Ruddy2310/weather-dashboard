@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Weather Dashboard — Rudra Soni</title>
+<style>
+:root{--bg:#dbeafe;--card:#fff;--ink:#14213d;--mute:#5b6b8a;--acc:#2563eb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1626;--card:#16213a;--ink:#e8eefc;--mute:#9db0d4;--acc:#6ea0ff}}
+:root[data-theme="dark"]{--bg:#0e1626;--card:#16213a;--ink:#e8eefc;--mute:#9db0d4;--acc:#6ea0ff}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif;min-height:100vh;display:grid;place-items:center;padding:20px}
+main{width:100%;max-width:420px}
+h1{font-size:22px;margin-bottom:14px}
+form{display:flex;gap:8px}
+input{flex:1;font:inherit;padding:12px 16px;border-radius:12px;border:1px solid #8aa0c733;background:var(--card);color:var(--ink)}
+button{font:inherit;border:0;background:var(--acc);color:#fff;padding:12px 20px;border-radius:12px;cursor:pointer}
+.card{background:var(--card);border-radius:24px;padding:28px;margin-top:16px;text-align:center;box-shadow:0 10px 30px #0001}
+.ic{font-size:72px;line-height:1}.t{font-size:64px;font-weight:600;letter-spacing:-2px}
+.c{color:var(--mute);text-transform:capitalize}
+.st{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.st div{background:var(--bg);border-radius:14px;padding:10px;font-size:14px;color:var(--mute)}.st b{display:block;color:var(--ink);font-size:18px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.chips button{background:var(--card);color:var(--ink);padding:5px 12px;font-size:13px;border-radius:999px}
+.note{margin-top:14px;font-size:12px;color:var(--mute);text-align:center}
+.err{color:#d33}
+</style></head><body><main>
+<h1>☁ Weather Dashboard</h1>
+<form id="f"><input id="q" placeholder="Search a city, e.g. Rajkot" autocomplete="off"><button>Search</button></form>
+<div class="chips" id="chips"></div>
+<div class="card" id="out"></div>
+<p class="note" id="note"></p>
+<p class="note">Built by Rudra Soni · HTML, CSS, JavaScript</p>
+</main>
+<script>
+// Demo data (used when no API key is set).
+var D={rajkot:[33,"clear sky","☀️",28,12],mumbai:[30,"haze","🌫️",74,15],delhi:[27,"few clouds","⛅",45,9],london:[9,"light rain","🌧️",83,20],"new york":[6,"overcast clouds","☁️",60,18],tokyo:[14,"clear sky","☀️",52,11],dubai:[34,"clear sky","☀️",40,16]};
+var KEY="";try{KEY=localStorage.getItem("owm")||""}catch(e){}
+var out=document.getElementById("out"),note=document.getElementById("note"),q=document.getElementById("q");
+function show(n,t,c,i,h,w){out.innerHTML='<div class="ic">'+i+'</div><div class="t">'+Math.round(t)+'°C</div><div style="font-weight:600;font-size:20px">'+n+'</div><div class="c">'+c+'</div><div class="st"><div>Humidity<b>'+h+'%</b></div><div>Wind<b>'+w+' km/h</b></div></div>'}
+function icon(m){return m<300?"⛈️":m<600?"🌧️":m<700?"❄️":m<800?"🌫️":m==800?"☀️":"☁️"}
+async function go(city){
+  city=city.trim();if(!city)return;note.textContent="";note.className="note";
+  if(KEY){try{var r=await fetch("https://api.openweathermap.org/data/2.5/weather?q="+encodeURIComponent(city)+"&units=metric&appid="+KEY);var j=await r.json();
+    if(j.cod==200){show(j.name,j.main.temp,j.weather[0].description,icon(j.weather[0].id),j.main.humidity,Math.round(j.wind.speed*3.6));note.textContent="Live data from OpenWeatherMap.";return}
+    note.textContent=j.message||"City not found.";note.className="note err";return}catch(e){note.textContent="Live API failed, showing demo data."}}
+  var d=D[city.toLowerCase()];
+  if(d){show(city[0].toUpperCase()+city.slice(1),d[0],d[1],d[2],d[3],d[4]);if(!note.textContent)note.textContent="Demo data. Add your OpenWeatherMap key to go live."}
+  else{out.innerHTML='<div class="ic">🔎</div><p class="c">City not found. Try Rajkot, Mumbai, Delhi, London, Tokyo…</p>'}
+}
+document.getElementById("f").onsubmit=function(e){e.preventDefault();go(q.value)};
+var ch=document.getElementById("chips");
+["Rajkot","Mumbai","Delhi","London","Tokyo","Dubai"].forEach(function(c){var b=document.createElement("button");b.textContent=c;b.type="button";b.onclick=function(){q.value=c;go(c)};ch.appendChild(b)});
+go("Rajkot");
+</script></body></html>
